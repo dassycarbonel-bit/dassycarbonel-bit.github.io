@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio & CV Futuriste</title>
+  
+  <!-- FontAwesome & Google Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ==========================================
+       1. VARIABLES & DESIGN SYSTÈME NEON
+       ========================================== */
+    :root {
+      --bg-dark: #050811;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(56, 189, 248, 0.2);
+      --primary: #00f0ff;
+      --secondary: #7000ff;
+      --accent: #ff007f;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --glow-primary: 0 0 25px rgba(0, 240, 255, 0.4);
+      --glow-secondary: 0 0 25px rgba(112, 0, 255, 0.4);
+      --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* BACKGROUND ANIMÉ */
+    #canvas-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* NAVIGATION */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(5, 8, 17, 0.85);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 8%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .logo {
+      font-family: 'Fira Code', monospace;
+      font-weight: 800;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: var(--glow-primary);
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .nav-links a.active, .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--primary);
+      box-shadow: var(--glow-primary);
+      transition: var(--transition);
+    }
+
+    .nav-links a.active::after, .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* GESTION MULTI-PAGES */
+    .page {
+      display: none;
+      padding: 7rem 5% 4rem;
+      min-height: 85vh;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .page.active-page {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* EFFET TEXTE ANIMÉ */
+    .typed-text, .typed-text-cv {
+      background: linear-gradient(135deg, var(--primary), #ffffff, var(--secondary));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine {
+      to { background-position: 200% center; }
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 3px;
+      height: 1.2em;
+      background-color: var(--primary);
+      margin-left: 5px;
+      vertical-align: middle;
+      box-shadow: var(--glow-primary);
+      animation: blink 0.7s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ==========================================
+       PAGE 1 : ACCUEIL / BIENVENUE
+       ========================================== */
+    #page-bienvenue {
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-welcome {
+      display: inline-block;
+      padding: 0.4rem 1.2rem;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--primary);
+      border-radius: 50px;
+      color: var(--primary);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--glow-primary);
+    }
+
+    .welcome-name {
+      font-size: 3.8rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      min-height: 5rem;
+    }
+
+    .welcome-subtitle {
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.9rem 2.2rem;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      box-shadow: var(--glow-primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 10px 30px rgba(0, 240, 255, 0.6);
+    }
+
+    /* ==========================================
+       PAGE 2 : LAYOUT CÔTE À CÔTE (MÊME HAUTEUR)
+       ========================================== */
+    .main-grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 2.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      align-items: stretch; /* Permet d'étirer la hauteur sur la case la plus longue */
+    }
+
+    /* BLOC CV (GAUCHE) */
+    .cv-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cv-header {
+      display: flex;
+      align-items: center;
+      gap: 1.8rem;
+      padding-bottom: 1.8rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1.8rem;
+    }
+
+    .cv-photo-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      flex-shrink: 0;
+    }
+
+    .cv-photo-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      z-index: 1;
+      animation: rotateGradient 6s linear infinite;
+    }
+
+    @keyframes rotateGradient {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .cv-photo {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      z-index: 2;
+      border: 3px solid var(--bg-dark);
+    }
+
+    .cv-title-area {
+      flex-grow: 1;
+    }
+
+    .cv-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 0.3rem;
+    }
+
+    .cv-subtitle {
+      font-family: 'Fira Code', monospace;
+      color: var(--primary);
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .cv-contact-inline {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .cv-contact-inline span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cv-contact-inline i {
+      color: var(--primary);
+    }
+
+    .cv-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .cv-section-title {
+      font-size: 1.1rem;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      border-bottom: 2px solid rgba(0, 240, 255, 0.2);
+      padding-bottom: 0.4rem;
+    }
+
+    .cv-section-title i {
+      color: var(--primary);
+    }
+
+    .cv-item {
+      margin-bottom: 1rem;
+    }
+
+    .cv-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .cv-item-sub {
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-family: 'Fira Code', monospace;
+      margin-bottom: 0.2rem;
+    }
+
+    .cv-item-desc {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ANIMATION : LANGAGES QUI FLOTTENT (FLOATING EFFECT) */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .skill-tag {
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      display: inline-block;
+      box-shadow: 0 4px 10px rgba(0, 240, 255, 0.1);
+      /* Animation Flottante */
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Application de durées et délais variables pour rendre le flottement naturel */
+    .skill-tag:nth-child(1) { animation-duration: 3.2s; animation-delay: 0s; }
+    .skill-tag:nth-child(2) { animation-duration: 2.8s; animation-delay: 0.4s; }
+    .skill-tag:nth-child(3) { animation-duration: 3.5s; animation-delay: 0.2s; }
+    .skill-tag:nth-child(4) { animation-duration: 2.6s; animation-delay: 0.6s; }
+    .skill-tag:nth-child(5) { animation-duration: 3.1s; animation-delay: 0.1s; }
+    .skill-tag:nth-child(6) { animation-duration: 3.4s; animation-delay: 0.5s; }
+
+    /* BLOC PROJETS EN 6 CASES (DROITE) */
+    .projects-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      height: 100%;
+    }
+
+    .section-header-right {
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #fff, var(--text-muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+      flex-grow: 1;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: var(--transition);
+      backdrop-filter: blur(15px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary);
+      box-shadow: var(--glow-primary);
+    }
+
+    .project-image {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+
+    .project-body {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-grow: 1;
+    }
+
+    .project-title {
+      font-size: 0.98rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-main);
+    }
+
+    .project-desc {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
+    }
+
+    .project-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .project-tag {
+      font-size: 0.7rem;
+      color: var(--primary);
+      font-family: 'Fira Code', monospace;
+      display: inline-block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .project-tag:nth-child(even) {
+      animation-duration: 2.5s;
+      animation-delay: 0.3s;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* RESPONSIVITÉ */
+    @media (max-width: 1024px) {
+      .main-grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS PARTICULES -->
+  <canvas id="canvas-bg"></canvas>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="logo" onclick="showPage('page-bienvenue')">&lt;Dev/&gt;</div>
+    <ul class="nav-links">
+      <li><a onclick="showPage('page-bienvenue')" id="nav-page-bienvenue" class="active">Accueil</a></li>
+      <li><a onclick="showPage('page-infos')" id="nav-page-infos">Mon CV & Projets</a></li>
+    </ul>
+  </nav>
+
+  <!-- ==========================================
+       PAGE 1 : ACCUEIL
+       ========================================== -->
+  <main id="page-bienvenue" class="page active-page">
+    <div>
+      <span class="badge-welcome"><i class="fa-solid fa-terminal"></i> Portfolio Développeur</span>
+      <div class="welcome-name">
+        <span class="typed-text"></span><span class="cursor"></span>
+      </div>
+      <p class="welcome-subtitle">
+        Bienvenue sur mon portfolio interactif. Découvre mon parcours, mes compétences et mes réalisations récentes.
+      </p>
+      <button onclick="showPage('page-infos')" class="btn btn-primary">
+        Consulter mon Profil <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- ==========================================
+       PAGE 2 : CV (GAUCHE) & 6 PROJETS (DROITE)
+       ========================================== -->
+  <main id="page-infos" class="page">
+    
+    <div class="main-grid-layout">
+      
+      <!-- CÔTÉ GAUCHE : LE CV COMPLET -->
+      <div class="cv-container">
+        
+        <div>
+          <!-- HEADER CV -->
+          <div class="cv-header">
+            <div class="cv-photo-wrapper">
+              <img src="d:\00--Important\6012802009808966858_121.jpg" alt="Photo de profil" class="cv-photo"/>
+            </div>
+
+            <div class="cv-title-area">
+              <div class="cv-name">
+                <span class="typed-text-cv"></span><span class="cursor"></span>
+              </div>
+              <div class="cv-subtitle">Étudiant en Informatique</div>
+              
+              <div class="cv-contact-inline">
+                <span><i class="fa-solid fa-envelope"></i> carbonelsizano@email.com</span>
+                <span><i class="fa-solid fa-phone"></i> +261 034 81 444 49</span>
+                <span><i class="fa-solid fa-location-dot"></i>Madagascar à Fianarantsoa</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DETAILS CV -->
+          <div class="cv-section">
+            <h2 class="cv-section-title"><i class="fa-solid fa-user-gear"></i> Profil</h2>
+            <p class="cv-item-desc">
+              Passionné par la programmation et la conception d'applications modernes, je recherche constamment à relever de nouveaux défis technologiques.
+            </p>
+          </div>
+
+          <div class="cv-section">
+            <h2 class="cv-section-title"><i class="fa-solid fa-graduation-cap"></i> Formation</h2>
+            <div class="cv-item">
+              <div class="cv-item-header">
+                <span>Mention en Informatique</span>
+                <span>2 ème de Licence</span>
+              </div>
+              <div class="cv-item-sub">Université / ENI (Ecole national en Informatique)</div>
+              <p class="cv-item-desc">Spécialisation en développement logiciel, algorithmique et bases de données.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPÉTENCES FLOTTANTES -->
+        <div class="cv-section" style="margin-bottom: 0;">
+          <h2 class="cv-section-title"><i class="fa-solid fa-code"></i> Compétences</h2>
+          <div class="skills-list">
+            <span class="skill-tag">HTML5 / CSS3</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">PHP</span>
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">C#</span>
+            <span class="skill-tag">C / C++</span>
+            <span class="skill-tag">Git & GitHub</span>
+            <span class="skill-tag">SQL</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CÔTÉ DROITE : LES 6 CASES DE PROJETS -->
+      <div class="projects-container">
+        <h2 class="section-header-right"><i class="fa-solid fa-laptop-code"></i> Mes Projets (6)</h2>
+
+        <div class="projects-grid">
+          
+          <!-- CASE 1 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=600&q=80" alt="Projet 1" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">1. Site Web Portfolio</h3>
+                <p class="project-desc">Interface moderne et interactive avec animations dynamiques.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#HTML</span>
+                <span class="project-tag">#CSS</span>
+                <span class="project-tag">#JS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 2 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Projet 2" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">2. Application de Gestion</h3>
+                <p class="project-desc">Outil de suivi des tâches et d'analyse de données en temps réel.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#React</span>
+                <span class="project-tag">#NodeJS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 3 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80" alt="Projet 3" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">3. Algorithme de Cryptage</h3>
+                <p class="project-desc">Système de chiffrement sécurisé pour le transfert de fichiers.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#Python</span>
+                <span class="project-tag">#Sécurité</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 4 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Projet 4" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">4. Application Mobile API</h3>
+                <p class="project-desc">Application météo interrogeant des API REST tierces.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#API</span>
+                <span class="project-tag">#Mobile</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 5 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" alt="Projet 5" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">5. Base de Données SQL</h3>
+                <p class="project-desc">Modélisation et optimisation d'une BDD relationnelle.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#SQL</span>
+                <span class="project-tag">#Database</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CASE 6 -->
+          <div class="project-card">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Projet 6" class="project-image"/>
+            <div class="project-body">
+              <div>
+                <h3 class="project-title">6. Jeu 2D interactif</h3>
+                <p class="project-desc">Petit jeu développé avec gestion de physique de base.</p>
+              </div>
+              <div class="project-tags">
+                <span class="project-tag">#C++</span>
+                <span class="project-tag">#Gaming</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Mon CV & Portfolio Futuriste</p>
+  </footer>
+
+  <!-- JAVASCRIPT : GESTION DES PAGES ET TYPING EFFECT -->
+  <script>
+    // 1. VARIABLE DU NOM D'UTILISATEUR
+    const myName = "RATOVONIAINA Sizano Carbonel"; 
+
+    // 2. NAVIGATION DYNAMIQUE
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) targetPage.classList.add('active-page');
+
+      const targetNav = document.getElementById('nav-' + pageId);
+      if (targetNav) targetNav.classList.add('active');
+
+      window.scrollTo(0, 0);
+
+      if(pageId === 'page-infos') {
+        startCvTyping();
+      }
+    }
+
+    // 3. EFFETS DE FRAPPE ANIMÉE (TYPING EFFECT)
+    let indexAccueil = 0;
+    const typedHomeElem = document.querySelector(".typed-text");
+
+    function typeWriterHome() {
+      if (indexAccueil < myName.length) {
+        typedHomeElem.textContent += myName.charAt(indexAccueil);
+        indexAccueil++;
+        setTimeout(typeWriterHome, 90);
+      }
+    }
+
+    let indexCv = 0;
+    let isCvTyped = false;
+    const typedCvElem = document.querySelector(".typed-text-cv");
+
+    function startCvTyping() {
+      if (isCvTyped) return;
+      isCvTyped = true;
+      typedCvElem.textContent = "";
+      indexCv = 0;
+      typeWriterCv();
+    }
+
+    function typeWriterCv() {
+      if (indexCv < myName.length) {
+        typedCvElem.textContent += myName.charAt(indexCv);
+        indexCv++;
+        setTimeout(typeWriterCv, 90);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(typeWriterHome, 400);
+      initParticles();
+    });
+
+    // 4. PARTICULES EN ARRIÈRE-PLAN
+    function initParticles() {
+      const canvas = document.getElementById('canvas-bg');
+      const ctx = canvas.getContext('2d');
+      
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const particles = [];
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          radius: Math.random() * 2 + 1,
+          alpha: Math.random() * 0.5 + 0.2
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, index) => {
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
+          ctx.fill();
+
+          for (let j = index + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(112, 0, 255, ${0.15 * (1 - dist / 120)})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>
